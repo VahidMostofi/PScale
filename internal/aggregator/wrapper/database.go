@@ -1,6 +1,8 @@
 package wrapper
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var minInterval int64 = 100
 

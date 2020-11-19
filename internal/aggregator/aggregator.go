@@ -1,5 +1,7 @@
 package aggregator
 
+import "github.com/vahidmostofi/wise-auto-scaler/internal/aggregator/wrapper"
+
 // RequestResponseTimes ...
 type RequestResponseTimes interface {
 	GetRequestsNames(int64, int64) ([]string, error)
@@ -25,4 +27,15 @@ type RequestStatus interface {
 	GetFailCounts(int64, int64) (map[string]int, error)
 	Done() error
 	AllDone() error
+}
+
+// GetAll returns RequestResponseTimes, RequestCounts, RequestStatus, error
+func GetAll() (RequestResponseTimes, RequestCounts, RequestStatus, error) {
+	w, err := wrapper.GetNewWrapperAggregator()
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return w, w, w, nil
+
 }
