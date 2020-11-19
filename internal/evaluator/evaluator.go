@@ -9,12 +9,14 @@ import (
 
 // Evaluator ...
 type Evaluator interface {
-	Evaluate() error
+	Evaluate(errCh chan error, closeCh chan struct{})
 	AddSLA(string, SLA) error
 	GetAggCounts() aggregator.RequestCounts
 	GetAggResponseTimes() aggregator.RequestResponseTimes
 	GetAggStatus() aggregator.RequestStatus
 	GetIntervalSeconds() time.Duration
+	GetViolationCounts() map[string]int
+	GetViolationInfo() map[string][]map[string]string
 }
 
 // Simple ...
@@ -54,13 +56,11 @@ func GetSimpleEvaluator() (Evaluator, error) {
 }
 
 // Evaluate ...
-func (se *Simple) Evaluate() error {
+func (se *Simple) Evaluate(errCh chan error, closeCh chan struct{}) {
 	fmt.Println("start monitoring for evaluation ")
 	fmt.Printf("evaluate every %f seconds\n", se.IntervalSeconds.Seconds())
 
 	ticker := time.NewTicker(se.IntervalSeconds)
-	quit := make(chan struct{})
-	forever := make(chan bool)
 	go func() {
 		fmt.Println("evaluating ...")
 		for {
@@ -71,7 +71,7 @@ func (se *Simple) Evaluate() error {
 					info := make(map[string]string)
 					isOk, err := s.Check(se, info)
 					if err != nil {
-						panic(fmt.Errorf("error while checking SLA %s: %w", name, err)) //TODO
+						errCh <- fmt.Errorf("error while checking SLA %s: %w", name, err)
 					}
 					if isOk { // meets the SLA
 						fmt.Println("✅", name, info)
@@ -82,15 +82,11 @@ func (se *Simple) Evaluate() error {
 					}
 				}
 				fmt.Println("=============================")
-			case <-quit:
+			case <-closeCh:
 				return
 			}
 		}
 	}()
-
-	<-forever
-
-	return nil
 }
 
 // AddSLA ...
@@ -115,3 +111,9 @@ func (se *Simple) GetAggStatus() aggregator.RequestStatus { return se.aggStatus 
 
 // GetIntervalSeconds ...
 func (se *Simple) GetIntervalSeconds() time.Duration { return se.IntervalSeconds }
+
+// GetViolationCounts ...
+func (se *Simple) GetViolationCounts() map[string]int { return se.violationCounts }
+
+// GetViolationInfo ...
+func (se *Simple) GetViolationInfo() map[string][]map[string]string { return se.violationInfo }

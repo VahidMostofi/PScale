@@ -43,8 +43,12 @@ func TestEvaluator(t *testing.T) {
 		RequestName: "edit_book",
 	})
 
-	err = e.Evaluate()
+	errCh := make(chan error)
+	closeCh := make(chan struct{})
+	go e.Evaluate(errCh, closeCh)
+
 	if err != nil {
 		panic(err)
 	}
+
 }
