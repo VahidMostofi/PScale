@@ -36,7 +36,7 @@ func GetNewWrapperAggregator() (*WrapperAggregator, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error while initializing WrapperAggregator: %w", err)
 	}
-	a.listen()
+	go a.listen()
 	return a, nil
 }
 
@@ -117,6 +117,7 @@ func (w *WrapperAggregator) listen() {
 
 	fmt.Printf(" [*] Waiting for messages. To exit press CTRL+C\n")
 	<-forever
+	fmt.Println("wrapper exited")
 }
 
 // GetRequestsNames ....
