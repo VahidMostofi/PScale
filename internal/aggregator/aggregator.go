@@ -29,13 +29,22 @@ type RequestStatus interface {
 	AllDone() error
 }
 
+var ar RequestResponseTimes
+var ac RequestCounts
+var as RequestStatus
+
 // GetAll returns RequestResponseTimes, RequestCounts, RequestStatus, error
 func GetAll() (RequestResponseTimes, RequestCounts, RequestStatus, error) {
-	w, err := wrapper.GetNewWrapperAggregator()
-	if err != nil {
-		return nil, nil, nil, err
+	if ar == nil {
+		w, err := wrapper.GetNewWrapperAggregator()
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		ar = w
+		ac = w
+		as = w
 	}
 
-	return w, w, w, nil
+	return ar, ac, as, nil
 
 }
