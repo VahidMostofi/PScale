@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/vahidmostofi/wise-auto-scaler/internal/evaluator"
 	"gopkg.in/yaml.v2"
 )
@@ -22,7 +23,7 @@ type EvaluationReport struct {
 
 // StartEvaluator ...
 func StartEvaluator() {
-	const ReportPath = "/home/vahid/Desktop/"
+	var ReportPath = viper.GetString("evaluate_report_path")
 	const SystemName = "bookstore-report"
 	er := EvaluationReport{}
 

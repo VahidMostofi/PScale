@@ -16,18 +16,25 @@ var (
 	}
 )
 
+// Execute ...
 func Execute() error {
 	return rootCmd.Execute()
 }
 
 func init() {
+	fmt.Println("root init")
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file")
 }
 
 func initConfig() {
+	viper.Set("Verbose", true)
+	viper.SetEnvPrefix("WA")
+	viper.AutomaticEnv()
+
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
+
 	} else {
 		//TODO error
 	}
