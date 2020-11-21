@@ -5,5 +5,7 @@ import (
 )
 
 func TestEvaluator(t *testing.T) {
-	StartEvaluator()
+	evaluatorIsDone := make(chan bool)
+	StartEvaluator(evaluatorIsDone)
+	<-evaluatorIsDone
 }

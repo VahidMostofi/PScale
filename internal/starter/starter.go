@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/vahidmostofi/wise-auto-scaler/internal/autoscaler"
 	"github.com/vahidmostofi/wise-auto-scaler/internal/evaluator"
 	"gopkg.in/yaml.v2"
 )
@@ -22,7 +23,7 @@ type EvaluationReport struct {
 }
 
 // StartEvaluator ...
-func StartEvaluator() {
+func StartEvaluator(done chan bool) {
 	var ReportPath = viper.GetString("evaluate_report_path")
 	const SystemName = "bookstore-report"
 	er := EvaluationReport{}
@@ -79,8 +80,6 @@ func StartEvaluator() {
 		panic(err)
 	}
 
-	forever := make(chan struct{})
-
 	// handle interupt
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -99,8 +98,36 @@ func StartEvaluator() {
 			if err != nil {
 				panic(err)
 			}
-			forever <- struct{}{}
+			done <- true
+			fmt.Println("Evaluator is done")
+			return
 		}
 	}()
-	<-forever
+}
+
+// StartAutoscaler ...
+func StartAutoscaler() {
+	a, err := autoscaler.GetNewSimpleAutoscaler()
+	if err != nil {
+		panic(err)
+	}
+	sigCh := make(chan autoscaler.Signal)
+	errCh := make(chan error)
+	closeCh := make(chan bool)
+	a.Autoscale(sigCh, closeCh, errCh)
+
+	doEvaluate := viper.GetBool("evaluate_enable")
+	evaluateDone := make(chan bool)
+	if doEvaluate {
+		StartEvaluator(evaluateDone)
+	}
+
+	for {
+		select {
+		case err := <-errCh:
+			panic(err)
+		case <-evaluateDone:
+			return
+		}
+	}
 }

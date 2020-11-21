@@ -21,6 +21,8 @@ var evaluateCmd = &cobra.Command{
 		viper.SetDefault("evaluate_interval", 12)
 		viper.SetDefault("evaluate_report_path", "/home/vahid/Desktop/")
 
-		starter.StartEvaluator()
+		evaluatorIsDone := make(chan bool)
+		starter.StartEvaluator(evaluatorIsDone)
+		<-evaluatorIsDone
 	},
 }

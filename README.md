@@ -8,7 +8,9 @@ set these environment variables:
 - ``` WA_EVALUATE_REPORT_PATH ``` the directory which the report will be saved into, ending with \, the file name will be ```SystemName + - + $(RandomString) + .yml```
 
 ### auto-scale
-to evaluate while auto-scaling, set ```WA_EVALUATE_ENABLE``` to ```true```
+- to evaluate while auto-scaling, set ```WA_EVALUATE_ENABLE``` to ```true``` (default to true)
+
+- ```WA_AUTOSCALE_INTERVAL``` specifies the monitor interval for autoscaler in seconds
 
 ### only evaluate
 to only evaluate, set the evaluate configs and run
