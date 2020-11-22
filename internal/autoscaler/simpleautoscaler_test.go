@@ -14,3 +14,7 @@ func TestSimpleAutoscaler(t *testing.T) {
 	err = <-errCh
 	panic(err)
 }
+
+func TestCommandRun(t *testing.T) {
+	executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/initial")
+}
