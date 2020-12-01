@@ -34,7 +34,7 @@ type Simple struct {
 func GetSimpleEvaluator() (Evaluator, error) {
 	se := &Simple{}
 
-	const interval time.Duration = 10 * time.Second
+	const interval time.Duration = 30 * time.Second
 
 	ar, ac, as, err := aggregator.GetAll()
 	if err != nil {
