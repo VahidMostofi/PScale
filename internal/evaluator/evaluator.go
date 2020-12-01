@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/vahidmostofi/wise-auto-scaler/internal/aggregator"
 )
 
@@ -34,7 +35,7 @@ type Simple struct {
 func GetSimpleEvaluator() (Evaluator, error) {
 	se := &Simple{}
 
-	const interval time.Duration = 30 * time.Second
+	var interval time.Duration = viper.GetDuration("evaluate_interval") * time.Second
 
 	ar, ac, as, err := aggregator.GetAll()
 	if err != nil {

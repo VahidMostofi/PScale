@@ -1,9 +1,30 @@
 ## Wise Autoscaler
-Uses configurations found by swarmmanager to efficiently scale a microservice application in Kubernetes.
+Uses configurations found by [swarmmanager](https://github.com/vahidmostofi/swarmmanager) to efficiently scale a microservice application in Kubernetes.
 
-## How to
-- install Minikube
-- install kubectl
-- deploy application
-- enable addon metric-server
-- use port forwarding to access the minikube server from another machine
+### Evaluate configs
+set these environment variables:
+
+- ``` WA_EVALUATE_INTERVAL ``` in seconds
+- ``` WA_EVALUATE_REPORT_PATH ``` the directory which the report will be saved into, ending with \, the file name will be ```SystemName + - + $(RandomString) + .yml```
+
+### auto-scale
+- to evaluate while auto-scaling, set ```WA_EVALUATE_ENABLE``` to ```true``` (default to true)
+
+- ```WA_AUTOSCALE_INTERVAL``` specifies the monitor interval for autoscaler in seconds
+
+### only evaluate
+to only evaluate, set the evaluate configs and run
+
+``` go run main.go devaluate ```
+
+or
+
+``` go run main.go eval ```
+
+
+TODO:
+
+- monitor number of cores in evaluate
+- update configs for bookstore
+- store information about all tests in evaluate
+- code to visualize the test and the results
