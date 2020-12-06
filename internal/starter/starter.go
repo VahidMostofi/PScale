@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vahidmostofi/wise-auto-scaler/internal/autoscaler"
 	"github.com/vahidmostofi/wise-auto-scaler/internal/evaluator"
+	"github.com/vahidmostofi/wise-auto-scaler/internal/monitor"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,6 +21,9 @@ type EvaluationReport struct {
 	End             int64                          `yaml:"end"`
 	ViolationCounts map[string]int                 `yaml:"violationsCounts"`
 	ViolationInfo   map[string][]map[string]string `yaml:"violationsInfo"`
+	TestCounts      int                            `yaml:"testCounts"`
+	Times           []int64                        `yaml:"times"`
+	Counts          []int                          `yaml:"counts"`
 }
 
 // StartEvaluator ...
@@ -80,6 +84,8 @@ func StartEvaluator(done chan bool) {
 		panic(err)
 	}
 
+	go monitor.RecordPodDetails(ReportPath+"cpu_used.csv", make(chan bool))
+
 	// handle interupt
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -89,7 +95,9 @@ func StartEvaluator(done chan bool) {
 			filePath := ReportPath + "as-" + SystemName + "-" + strconv.FormatInt(time.Now().Unix(), 10) + ".yml"
 			fmt.Println(filePath)
 			er.ViolationInfo = e.GetViolationInfo()
+			er.TestCounts = e.GetTestCounts()
 			er.ViolationCounts = e.GetViolationCounts()
+			er.Times, er.Counts = e.GetRequestCounts()
 			b, err := yaml.Marshal(er)
 			if err != nil {
 				panic(err)

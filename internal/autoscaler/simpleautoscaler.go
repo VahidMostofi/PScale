@@ -30,15 +30,18 @@ func (sa *simpleAutoscaler) Autoscale(signals chan Signal, close chan bool, errs
 }
 
 func (sa *simpleAutoscaler) updateRequestRate(rate int) {
-	if rate > 101 {
+	if rate > 126 {
+		fmt.Println("Autoscaler: scaling to 150")
+		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(175))
+	} else if rate > 101 {
 		fmt.Println("Autoscaler: scaling to 125")
-		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(125))
+		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(150))
 	} else if rate > 76 {
 		fmt.Println("Autoscaler: scaling to 100")
-		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(100))
+		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(125))
 	} else if rate > 1 {
 		fmt.Println("Autoscaler: scaling to 75")
-		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(75))
+		executeCommand("kubectl apply -f /home/vahid/workspace/dynamicworkload/configs/bookstore-nodejs/" + strconv.Itoa(100))
 	}
 }
 
@@ -99,7 +102,7 @@ func executeCommand(command string) string {
 	//
 	// If you have an encrypted private key, the crypto/x509 package
 	// can be used to decrypt it.
-	key, err := ioutil.ReadFile("/Users/vahid/.ssh/id_rsa")
+	key, err := ioutil.ReadFile("/home/vahid/.ssh/id_rsa")
 	if err != nil {
 		log.Fatalf("unable to read private key: %v", err)
 	}

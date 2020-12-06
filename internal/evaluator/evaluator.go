@@ -18,6 +18,8 @@ type Evaluator interface {
 	GetIntervalSeconds() time.Duration
 	GetViolationCounts() map[string]int
 	GetViolationInfo() map[string][]map[string]string
+	GetTestCounts() int
+	GetRequestCounts() ([]int64, []int)
 }
 
 // Simple ...
@@ -29,6 +31,9 @@ type Simple struct {
 	violationCounts  map[string]int
 	violationInfo    map[string][]map[string]string
 	IntervalSeconds  time.Duration
+	testCount        int
+	times            []int64
+	counts           []int
 }
 
 // GetSimpleEvaluator ...
@@ -67,6 +72,7 @@ func (se *Simple) Evaluate(errCh chan error, closeCh chan struct{}) {
 		for {
 			select {
 			case <-ticker.C:
+				se.testCount++
 				fmt.Printf("evaluating %d SLAs\n", len(se.slas))
 				for name, s := range se.slas {
 					info := make(map[string]string)
@@ -75,7 +81,7 @@ func (se *Simple) Evaluate(errCh chan error, closeCh chan struct{}) {
 						errCh <- fmt.Errorf("error while checking SLA %s: %w", name, err)
 					}
 					if isOk { // meets the SLA
-						fmt.Println("✅", name, info)
+						// fmt.Println("✅", name, info)
 					} else {
 						se.violationCounts[name]++
 						se.violationInfo[name] = append(se.violationInfo[name], info)
@@ -83,6 +89,29 @@ func (se *Simple) Evaluate(errCh chan error, closeCh chan struct{}) {
 					}
 				}
 				fmt.Println("=============================")
+			case <-closeCh:
+				return
+			}
+		}
+	}()
+
+	ticker2 := time.NewTicker(1 * time.Second)
+	go func() {
+		fmt.Println("evaluator counting requests ...")
+		for {
+			select {
+			case <-ticker2.C:
+				end := time.Now().UnixNano() / 1e6
+				start := end - 30e3
+
+				total := 0
+				counts, _ := se.aggCounts.GetRequestsCounts(start, end)
+				for _, c := range counts {
+					total += c
+				}
+				se.times = append(se.times, start)
+				se.counts = append(se.counts, total/30)
+				// fmt.Println(total / 30)
 			case <-closeCh:
 				return
 			}
@@ -118,3 +147,9 @@ func (se *Simple) GetViolationCounts() map[string]int { return se.violationCount
 
 // GetViolationInfo ...
 func (se *Simple) GetViolationInfo() map[string][]map[string]string { return se.violationInfo }
+
+// GetTestCounts ...
+func (se *Simple) GetTestCounts() int { return se.testCount }
+
+// GetRequestCounts ...
+func (se *Simple) GetRequestCounts() ([]int64, []int) { return se.times, se.counts }
