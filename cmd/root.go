@@ -10,9 +10,9 @@ import (
 var (
 	cfgFile string
 	rootCmd = &cobra.Command{
-		Use:   "autoscaler",
-		Short: "autoscaler",
-		Long:  "autoscaler",
+		Use:   "pscale",
+		Short: "pscale",
+		Long:  "pscale",
 	}
 )
 

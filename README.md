@@ -22,6 +22,25 @@ or
 ``` go run main.go eval ```
 
 
+```
+pscale
+
+Usage:
+  pscale [command]
+
+Available Commands:
+  autoscale   autoscale the deployment
+  evaluate    evaluate the deployment
+  help        Help about any command
+
+Flags:
+      --config string   config file
+  -h, --help            help for pscale
+
+Use "pscale [command] --help" for more information about a command.
+```
+
+
 TODO:
 
 - monitor number of cores in evaluate
