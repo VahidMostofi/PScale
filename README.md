@@ -1,5 +1,5 @@
-## Wise Autoscaler
-Uses configurations found by [swarmmanager](https://github.com/vahidmostofi/swarmmanager) to efficiently scale a microservice application in Kubernetes.
+## PScale Autoscaler
+Uses configurations found by [Proactive](https://github.com/vahidmostofi/proactive) to efficiently scale a microservice application in Kubernetes.
 
 ### Evaluate configs
 set these environment variables:
@@ -20,11 +20,3 @@ to only evaluate, set the evaluate configs and run
 or
 
 ``` go run main.go eval ```
-
-
-TODO:
-
-- monitor number of cores in evaluate
-- update configs for bookstore
-- store information about all tests in evaluate
-- code to visualize the test and the results
